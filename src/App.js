@@ -7,6 +7,7 @@ import { InputAdornment, Grid, styled } from '@mui/material';
 import { CheckBoxOutlineBlank } from "@mui/icons-material";
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
+const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:5001";
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
     '& .MuiOutlinedInput-root': {
@@ -37,7 +38,7 @@ function App() {
         (async () => {
             setLoading(true);
             try {
-                const { data } = await axios.get("http://localhost:5001/added-songs");
+                const { data } = await axios.get(`${backendUrl}/added-songs`);
                 setAddedSongs(data);
             } catch (error) {
                 console.error("Error fetching songs:", error);
@@ -71,7 +72,7 @@ function App() {
         if (!debouncedQuery.trim()) return setResults([]);
         (async () => {
             try {
-                const { data } = await axios.get(`http://localhost:5001/search?q=${debouncedQuery}`);
+                const { data } = await axios.get(`${backendUrl}/search?q=${debouncedQuery}`);
                 setResults(data);
             } catch (error) {
                 console.error("Error fetching songs:", error);
@@ -95,7 +96,7 @@ function App() {
             } else {
                 const newSong = { song: selectedSong, nicknames: [nickname] };
                 setAddedSongs((prev) => [...prev, newSong]);
-                await axios.post('http://localhost:5001/add-song', { song: selectedSong, nickname });
+                await axios.post(`${backendUrl}/add-song`, { song: selectedSong, nickname });
                 setAlert({ show: true, message: "your song just dropped like a bass in an edm night!" });
             }
         } catch (error) {
