@@ -1,61 +1,58 @@
-import React, { useState } from 'react';
-import { TextField, InputAdornment, IconButton } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import ClearIcon from '@mui/icons-material/Clear';
-import { styled } from '@mui/material/styles';
+import React, { useState } from "react";
+import { TextField, InputAdornment, IconButton } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import ClearIcon from "@mui/icons-material/Clear";
+import { styled } from "@mui/material/styles";
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
-  '& .MuiOutlinedInput-root': {
+  maxWidth: 350, // Fixed width for better layout
+  "& .MuiOutlinedInput-root": {
     borderRadius: 30, // Rounded corners
-    '& fieldset': {
+    paddingRight: 8, // Ensure padding around icons
+    "& fieldset": {
       borderColor: theme.palette.grey[500], // Subtle border color
     },
-    '&:hover fieldset': {
+    "&:hover fieldset": {
       borderColor: theme.palette.grey[700], // Darker border on hover
     },
-    '&.Mui-focused fieldset': {
-      borderColor: '#1DB954', // Spotify green on focus
-      boxShadow: `${theme.palette.primary.main} 0 0 0 0.2rem`, // Subtle shadow
+    "&.Mui-focused fieldset": {
+      borderColor: "#1DB954", // Spotify green on focus
+      boxShadow: "0 0 0 3px rgba(29, 185, 84, 0.4)", // Soft glow effect
     },
   },
-  '& .MuiInputBase-input': {
-    paddingLeft: '16px', // Adjust padding for icon
+  "& .MuiInputBase-input": {
+    paddingLeft: "14px", // Adjust padding for search icon
+    paddingRight: "14px", // Adjust padding for clear icon
   },
 }));
 
-
 const SearchBar = () => {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
 
   const handleClear = () => {
-    setQuery('');
+    setQuery(""); // Clear search input
   };
 
   return (
     <StyledTextField
-      fullWidth // Take full width available
+      fullWidth
       placeholder="Search for a song..."
-      variant="outlined" // Outlined input
+      variant="outlined"
       value={query}
       onChange={(e) => setQuery(e.target.value)}
-      InputProps={{
+      InputAdornment={{
         startAdornment: (
           <InputAdornment position="start">
-            <SearchIcon />
+            <SearchIcon color="action" />
           </InputAdornment>
         ),
-        endAdornment: query && ( // Only show clear icon if there's input
+        endAdornment: query && (
           <InputAdornment position="end">
-            <IconButton onClick={handleClear} edge="end">
+            <IconButton onClick={handleClear} edge="end" size="small">
               <ClearIcon />
             </IconButton>
           </InputAdornment>
         ),
-      }}
-      sx={{ // Styling the search bar container
-        '& .MuiTextField-root': {
-            width: '350px' // Fixed width for the search bar
-        }
       }}
     />
   );
