@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import SongCard from "./components/SongCard/SongCard";
-import { ThemeProvider, createTheme, CssBaseline, Dialog, DialogActions, DialogContent, TextField, Button, CircularProgress, Paper, Alert } from "@mui/material";
+import { ThemeProvider, createTheme, CssBaseline, Dialog, DialogActions, DialogContent, TextField, Button, CircularProgress, Paper, Alert, Box, Typography } from "@mui/material";
 import SpotifyPlaylistTable from "./components/SpotifyTable/SpotifyTable";
 import { InputAdornment, Grid, styled } from '@mui/material';
-import { CheckBoxOutlineBlank } from "@mui/icons-material";
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 import { Filter } from 'bad-words'
@@ -52,7 +51,7 @@ function App() {
     // Show alert for a limited time
     useEffect(() => {
         if (alert.show) {
-            const timer = setTimeout(() => setAlert({ show: false, message: "" }), 10000);
+            const timer = setTimeout(() => setAlert({ show: false, message: "" }), 8000);
             return () => clearTimeout(timer);
         }
     }, [alert]);
@@ -105,12 +104,12 @@ function App() {
             setLoading(true); // Set loading to true *before* the API call
             const songExists = addedSongs.some((item) => item.song.id === selectedSong.id);
             if (songExists) {
-                setAlert({ show: true, message: "great minds think alike! this song is already added." });
+                setAlert({ show: true, message: "great minds think alike! this song is already added. thank you" });
             } else {
                 const newSong = { song: selectedSong, nicknames: [nickname] };
                 setAddedSongs((prev) => [...prev, newSong]);
                 await axios.post(`${backendUrl}/add-song`, { song: selectedSong, nickname });
-                setAlert({ show: true, message: "your song just dropped like a bass in an edm night!" });
+                setAlert({ show: true, message: "your song just dropped like a bass in an edm night! thank you" });
 
                 //Refetch after successful update
                 const { data } = await axios.get(`${backendUrl}/added-songs`);
@@ -130,125 +129,142 @@ function App() {
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            <div style={{padding: '100px'}}>
-                <Grid
-                    container
-                    direction="column"
-                    sx={{
-                        justifyContent: "flex-start",
-                        alignItems: "left",
-                    }}
-                    md
-                >
-                {/* <ButtonAppBar/> */}
-                    
-                {/* <input
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search for a song..."
-                /> */}
-                <h1>got a tune that slaps? share it with <span style={{ color: "#1a9e44" }}>ayush!</span></h1>
-
-                <StyledTextField
-                    fullWidth
-                    placeholder="Search for a song..."
-                    variant="outlined"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    InputProps={{
-                        startAdornment: (
-                        <InputAdornment position="start">
-                            <SearchIcon />
-                        </InputAdornment>
-                        ),
-                        endAdornment: query &&(
+            <Box sx={{ flexGrow: 1, p: { xs: 2, md: 4 } }}>
+                <Grid container spacing={5} direction="column" alignItems="stretch">
+                <Grid item xs={12} md={10} lg={8} sx={{ mx: 10, mt: 10 }}> 
+                    <h1>got a tune that slaps? share it with <span style={{ color: "#1a9e44" }}>ayush!</span></h1>
+                    <StyledTextField
+                        fullWidth
+                        placeholder="search for a song..."
+                        variant="outlined"
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        InputProps={{
+                            startAdornment: (
                             <InputAdornment position="start">
-                                <ClearIcon onClick={handleClearSearch}/>
+                                <SearchIcon />
                             </InputAdornment>
-                        ),
-                    }}
-                    sx={{
-                        '& .MuiTextField-root': {
-                            minWidth: '550px' // Fixed width for the search bar
-                        }
-                    }}
-                />
+                            ),
+                            endAdornment: query &&(
+                                <InputAdornment position="start">
+                                    <ClearIcon onClick={handleClearSearch}/>
+                                </InputAdornment>
+                            ),
+                        }}
+                        sx={{
+                            '& .MuiTextField-root': {
+                                minWidth: '550px' // Fixed width for the search bar
+                            }
+                        }}
+                    />
+                </Grid>
                 {/* Search Results */}
+                <Grid item xs={12} md={10} lg={8} sx={{ mx: 10 }}> {/* Add margin top */}
                 {query && (
-                        <div style={{ paddingTop: '75px' }}>
-                            <Paper elevation={2} variant="outlined" style={{ padding: '10px', backgroundColor: '#212121' }}>
-                                <h2 style={{ textAlign: 'center' }}>
-                                    Click on a song below to <span style={{ color: "#1a9e44" }}>add</span>
-                                </h2>
-                                <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-around" }}>
-                                    {results.length === 0 ? (
-                                        <p>No results found</p>
-                                    ) : (
-                                        results.slice(0, 8).map((song) => (
-                                            <SongCard key={song.id} song={song} onClick={handleCardClick} />
-                                        ))
-                                    )}
-                                </div>
-                            </Paper>
+                    <Paper elevation={3} variant="outlined" style={{ padding: '10px', backgroundColor: 'rgba(0, 24, 9, 0.4)' }}>
+                        <h2 style={{ textAlign: 'center' }}>
+                            click on a song below to <span style={{ color: "#1a9e44" }}>add</span>
+                        </h2>
+                        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-around" }}>
+                            {results.length === 0 ? (
+                                <p>no results found</p>
+                            ) : (
+                                results.slice(0, 8).map((song) => (
+                                    <SongCard key={song.id} song={song} onClick={handleCardClick} />
+                                ))
+                            )}
                         </div>
+                    </Paper>
                     )}
+                    </Grid>
                 
                 {/* Add Song Modal */}
-                <Dialog open={openModal} onClose={() => setOpenModal(false)} PaperProps={{
-                        sx: {
-                            backgroundColor: 'rgba(3, 3, 3, 0.9)', // Semi-transparent black background
-                            backdropFilter: 'blur(5px)', // Apply blur to the backdrop
-                            width: '400px', // Fixed width
-                            maxWidth: '400px', // Prevent width from exceeding fixed value
-                            margin: 'auto', // Center the modal
-                            borderRadius: '10px'
-                        },
-                    }}
-                    BackdropProps={{
-                        sx: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dimmed backdrop
-                        },
-                    }}>
-                        {loading && <CircularProgress />}
-                        <DialogContent sx={{padding: '20px'}}> {/* Add padding to content */}
-                        <div style={{ marginBottom: '10px' }}> {/* Add margin for spacing */}
-                            Interesting, let the world know who recommended it (or stay anonymous)
-                        </div>
-                        <TextField
-                            autoFocus
-                            margin="dense"
-                            type="text"
-                            fullWidth
-                            placeholder="Your name, legend?"
-                            value={nickname}
-                            onChange={handleNicknameChange}
-                        />
+                <Dialog
+                open={openModal}
+                onClose={() => setOpenModal(false)}
+                PaperProps={{
+                    sx: {
+                        backgroundColor: '#121212',
+                        backdropFilter: 'blur(8px)',
+                        width: { xs: '90%', sm: '400px' },
+                        maxWidth: '450px',
+                        margin: 'auto',
+                        borderRadius: '16px',
+                        boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.2)', 
+                        overflow: 'hidden', 
+                    },
+                }}
+                BackdropProps={{
+                    sx: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.7)', 
+                    },
+                }}
+            >
+                
+                <DialogContent sx={{ padding: '24px'  }}> {/* Increased padding */}
+                    {
+                        loading ? <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+                        <CircularProgress color="success" /></div> : 
+                        <div><Typography variant="body2" color="text.secondary" gutterBottom>
+                        let the world know who recommended it (or stay anonymous xD)
+                    </Typography>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        type="text"
+                        fullWidth
+                        placeholder="your name, legend?"
+                        value={nickname}
+                        onChange={handleNicknameChange}
+                        InputProps={{
+                            sx: {
+                                backgroundColor: '#282828', // Darker input background
+                                borderRadius: '8px', // Rounded input corners
+                                color: 'white', // White text
+                                '&:before': { borderBottomColor: '#1DB954' }, // Green underline on focus
+                                '&:focus-within': {
+                                    '& .MuiInputLabel-root': {
+                                        color: '#1DB954'
+                                    }
+                                }
+                            },
+                        }}
+                        InputLabelProps={{
+                            sx: {
+                                color: 'grey', // Grey label text
+                            }
+                        }}
+                    /></div>
+                    }
+                    
                     </DialogContent>
-                        <DialogActions>
-                            <Button onClick={() => setOpenModal(false)} color="">Cancel</Button>
-                            <Button onClick={addSong} style={{ color: "#1a9e44" }}>Add Song</Button>
-                        </DialogActions>
-                    </Dialog>
+                    {!loading && <DialogActions sx={{ padding: '16px', backgroundColor: '#121212' }}> {/* Action button styling */}
+                        <Button onClick={() => setOpenModal(false)} color="inherit">Cancel</Button>
+                        <Button onClick={addSong} sx={{ color: '#1DB954', fontWeight: 'bold' }}>Add Song</Button>
+                    </DialogActions>}
+                 </Dialog>
 
                 {/* Alert Notification */}
-                    {alert.show && (
-                        <Alert style={{marginTop: '50px'}} icon={<CheckBoxOutlineBlank fontSize="inherit" />} severity="success">
+                {alert.show && (
+                    <Grid item xs={12} md={8} sx={{ mx: 10 }}> {/* Add margin top */}
+                        <Alert sx={{ fontSize: 'larger' }} icon={false} variant="filled" severity="success" onClose={() => {setAlert({ show: false, message: "" })}} style={{color: '#fff'}}>
                             {alert.message}
                         </Alert>
+                    </Grid>
                 )}
-            {/* Playlist Table */}
-            <div style={{ width: '100%', marginTop: '100px' }}>
-                        <h1>great tracks, greater contributors!</h1>
-                        {loading ? (
-                            <div style={{ display: "flex", justifyContent: "center", padding: "50px" }}>
-                                <CircularProgress />
-                            </div>
-                        ) : (
-                            <SpotifyPlaylistTable rows={addedSongs} />
-                        )}
-            </div>
+                {/* Playlist Table */}
+                <Grid item xs={12} md={10} lg={8} sx={{ mx: 10, mt: 10 }}> {/* Add larger margin top */}
+                    <h2>great tracks, greater contributors!</h2>
+                    {loading ? (
+                        <div style={{ display: "flex", justifyContent: "center", padding: "50px" }}>
+                            <CircularProgress color="success" />
+                        </div>
+                    ) : (
+                        <SpotifyPlaylistTable rows={addedSongs} />
+                    )}
+                </Grid>
             </Grid>
-        </div>
+        </Box>
         
         </ThemeProvider>
     );
