@@ -98,6 +98,10 @@ function App() {
                 setAddedSongs((prev) => [...prev, newSong]);
                 await axios.post(`${backendUrl}/add-song`, { song: selectedSong, nickname });
                 setAlert({ show: true, message: "your song just dropped like a bass in an edm night!" });
+
+                //Refetch after successful update
+                const { data } = await axios.get(`${backendUrl}/added-songs`);
+                setAddedSongs(data);
             }
         } catch (error) {
             console.error("Error adding song:", error);
