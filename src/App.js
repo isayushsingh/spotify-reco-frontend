@@ -7,6 +7,7 @@ import { InputAdornment, Grid, styled } from '@mui/material';
 import { CheckBoxOutlineBlank } from "@mui/icons-material";
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
+import { Filter } from 'bad-words'
 const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:5001";
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
@@ -21,7 +22,7 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
 
 // Dark theme using Material-UI
 const theme = createTheme({ palette: { mode: "dark" } });
-
+const filter = new Filter();
 function App() {
     const [query, setQuery] = useState("");
     const [results, setResults] = useState([]);
@@ -84,6 +85,18 @@ function App() {
     const handleCardClick = (song) => {
         setSelectedSong(song);
         setOpenModal(true);
+    };
+
+    const handleNicknameChange = (e) => {
+        let input = e.target.value;
+        // Character limit of 15
+        if (input.length > 15) return;
+        // Check for profanity
+        if (filter.isProfane(input)) {
+            
+            return;
+        }
+        setNickname(input);
     };
 
     // Handle adding a song
@@ -208,7 +221,7 @@ function App() {
                             fullWidth
                             placeholder="Your name, legend?"
                             value={nickname}
-                            onChange={(e) => setNickname(e.target.value)}
+                            onChange={handleNicknameChange}
                         />
                     </DialogContent>
                         <DialogActions>
